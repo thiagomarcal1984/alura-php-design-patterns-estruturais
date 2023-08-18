@@ -99,3 +99,46 @@ require 'vendor/autoload.php';
 $registroOrcamento = new RegistroOrcamento(new CurlHttpAdapter());
 $registroOrcamento->registrarOrcamento(new Orcamento());
 ```
+## Modificando a implementação
+Em resumo: abstraindo vários códigos para uma interface adaptadora facilitamos a modificação de implementações através da mudança do adaptador concreto.
+
+Mudança no adaptador chamado no arquivo `registro-orcamento.php`:
+```php
+<?php
+
+use Alura\DesignPattern\Http\CurlHttpAdapter;
+use Alura\DesignPattern\Http\ReactPHPHttpAdapter;
+use Alura\DesignPattern\Orcamento;
+use Alura\DesignPattern\RegistroOrcamento;
+
+require 'vendor/autoload.php';
+
+// Repare que o adaptador usado ao instanciar RegistroOrcamento mudou, e o código mantém seu funcionamento.
+$registroOrcamento = new RegistroOrcamento(new ReactPHPHttpAdapter());
+$registroOrcamento->registrarOrcamento(new Orcamento());
+// $orcamento = new Orcamento();
+// $orcamento->valor = 500;
+// $orcamento->quantidadeItens = 2;
+// $orcamento->aprova();
+// $orcamento->finaliza();
+// $registroOrcamento->registrarOrcamento($orcamento);
+```
+Implementação do adaptador `ReactPHPHttpAdapter`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Http;
+
+class ReactPHPHttpAdapter implements HttpAdapter
+{
+    public function post(string $url, array $data = [])
+    {
+        // Instancio o React PHP.
+        // Preparo os dados.
+        // Faço a requisição.
+        echo "ReactPHP";
+    }
+}
+```
+
+Leitura complementar sobre o padrão Adapter: https://refactoring.guru/design-patterns/adapter
