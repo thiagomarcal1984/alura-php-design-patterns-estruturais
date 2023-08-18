@@ -207,3 +207,71 @@ $orcamentoZip->exportar($orcamento);
 ```
 
 > Problema: Duas classes foram necessárias para exportar um **orçamento** para XML e para ZIP. Se precisarmos exportar um outro objeto (por exemplo, um pedido ou uma nota fiscal), teríamos que criar mais duas classes para exportar cada novo tipo de objeto. E se houver mais um formato para exportar, seria necessário acrescentar mais um método para cada classe (o que dificulta muito a manutenção).
+
+## Exportando conteúdo
+As classes do pacote `Alura\DesignPattern\Relatorios` foram removidas. Primeiramente vamos abstrair o conteúdo exportado e criar implementações para dois tipos de conteúdo (pedido e orçamento).
+
+Interface `ConteudoExportado`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+interface ConteudoExportado
+{
+    public function conteudo() : array;
+}
+```
+Implementação do pedido exportado:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+use Alura\DesignPattern\Pedido;
+
+class PedidoExportado implements ConteudoExportado
+{
+    private Pedido $pedido;
+
+    public function __construct(Pedido $pedido)
+    {
+        $this->pedido = $pedido;
+    }
+
+    public function conteudo() : array
+    {
+        return [
+            'dataFinalizacao' => $this->pedido->dataFinalizacao->format('d/m/Y'),
+            'nomeCliente' => $this->pedido->nomeCliente,
+        ];
+    }
+}
+```
+Implementação do orçamento exportado:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+use Alura\DesignPattern\Orcamento;
+
+class OrcamentoExportado implements ConteudoExportado
+{
+    private Orcamento $orcamento;
+
+    public function __construct(Orcamento $orcamento)
+    {
+        $this->orcamento = $orcamento;
+    }
+
+    public function conteudo() : array
+    {
+        return [
+            'valor' => $this->orcamento->valor,
+            'quantidadeItens' => $this->orcamento->quantidadeItens,
+        ];
+    }
+}
+```
+> Na próxima aula veremos como implementar os formatos de exportação para cada tipo de conteúdo exportado.
