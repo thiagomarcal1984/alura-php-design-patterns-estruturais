@@ -1,5 +1,5 @@
 # Padrões estruturais (Gang of Four)
-- [ ] Adapter
+- [x] Adapter
 - [ ] Bridge
 - [ ] Composite
 - [ ] Decorator
@@ -142,3 +142,27 @@ class ReactPHPHttpAdapter implements HttpAdapter
 ```
 
 Leitura complementar sobre o padrão Adapter: https://refactoring.guru/design-patterns/adapter
+
+# Exportando dados com Bridge
+
+## Exportando orçamentos como XML
+Criação da classe `OrcamentoXml.php`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+use Alura\DesignPattern\Orcamento;
+
+class OrcamentoXml
+{
+    public function exportarOrcamento(Orcamento $orcamento) : string
+    {
+        $elementoOrcamento = new \SimpleXMLElement('<orcamento/>');
+        $elementoOrcamento->addChild('valor', $orcamento->valor);
+        $elementoOrcamento->addChild('quantidade_itens', $orcamento->quantidadeItens);
+
+        return $elementoOrcamento->asXML();
+    }
+}
+```
