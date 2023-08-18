@@ -6,7 +6,7 @@ use Alura\DesignPattern\Orcamento;
 
 class OrcamentoXml
 {
-    public function exportarOrcamento(Orcamento $orcamento) : string
+    public function exportar(Orcamento $orcamento) : string
     {
         $elementoOrcamento = new \SimpleXMLElement('<orcamento/>');
         $elementoOrcamento->addChild('valor', $orcamento->valor);

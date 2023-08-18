@@ -156,7 +156,7 @@ use Alura\DesignPattern\Orcamento;
 
 class OrcamentoXml
 {
-    public function exportarOrcamento(Orcamento $orcamento) : string
+    public function exportar(Orcamento $orcamento) : string
     {
         $elementoOrcamento = new \SimpleXMLElement('<orcamento/>');
         $elementoOrcamento->addChild('valor', $orcamento->valor);
@@ -166,3 +166,44 @@ class OrcamentoXml
     }
 }
 ```
+
+## Exportando orçamentos como ZIP
+Criação da classe que exporta o orçamento para o formato .zip:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+use Alura\DesignPattern\Orcamento;
+
+class OrcamentoZip
+{
+    public function exportar(Orcamento $orcamento)
+    {
+        $caminhoArquivo = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'orcamento.zip';
+        $zip = new \ZipArchive();
+        $zip->open($caminhoArquivo, \ZipArchive::CREATE);
+
+        $zip->addFromString('orcamento.serial', serialize($orcamento));
+        $zip->close();
+    }
+}
+```
+
+Invocação da classe `OrcamentoZip`:
+```php
+<?php
+
+use Alura\DesignPattern\Orcamento;
+use Alura\DesignPattern\Relatorios\OrcamentoZip;
+
+require 'vendor/autoload.php';
+
+$orcamentoZip = new OrcamentoZip();
+$orcamento = new Orcamento();
+$orcamento->valor = 500;
+
+$orcamentoZip->exportar($orcamento);
+```
+
+> Problema: Duas classes foram necessárias para exportar um **orçamento** para XML e para ZIP. Se precisarmos exportar um outro objeto (por exemplo, um pedido ou uma nota fiscal), teríamos que criar mais duas classes para exportar cada novo tipo de objeto. E se houver mais um formato para exportar, seria necessário acrescentar mais um método para cada classe (o que dificulta muito a manutenção).
