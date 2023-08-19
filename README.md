@@ -275,3 +275,112 @@ class OrcamentoExportado implements ConteudoExportado
 }
 ```
 > Na próxima aula veremos como implementar os formatos de exportação para cada tipo de conteúdo exportado.
+
+## Implementações de formatos
+As interfaces `ConteudoExportado` e `ArquivoExportado` fazem uma ponte (**bridge**) entre os conteúdos concretos e e as exportações concretas dos formatos de arquivos.
+
+Interace `ArquivoExportado`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+interface ArquivoExportado
+{
+    public function salvar(ConteudoExportado $conteudoExportado) : string;
+}
+```
+Implementação pra exportar como Zip:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+class ArquivoZipExportado implements ArquivoExportado
+{
+    private string $nomeArquivoInterno;
+
+    public function __construct(string $nomeArquivoInterno)
+    {
+        $this->nomeArquivoInterno = $nomeArquivoInterno;
+    }
+
+    public function salvar(ConteudoExportado $conteudoExportado) : string
+    {
+        $caminhoArquivo = tempnam(sys_get_temp_dir(), 'zip');
+        $arquivoZip = new \ZipArchive();
+        $arquivoZip->open($caminhoArquivo);
+        $arquivoZip->addFromString($this->nomeArquivoInterno, serialize($conteudoExportado->conteudo()));
+        $arquivoZip->close();
+        return $caminhoArquivo;
+    }
+}
+```
+Implementação para exportar como XML:
+```php
+<?php
+
+namespace Alura\DesignPattern\Relatorios;
+
+class ArquivoXmlExportado implements ArquivoExportado
+{
+    private string $nomeElementoPai;
+
+    public function __construct(string $nomeElementoPai)
+    {
+        $this->nomeElementoPai = $nomeElementoPai;
+    }
+    
+    public function salvar(ConteudoExportado $conteudoExportado) : string
+    {
+        $elementoXml = new \SimpleXMLElement("<{$this->nomeElementoPai}/>");
+        foreach ($conteudoExportado->conteudo() as $item => $valor) {
+            $elementoXml->addChild($item, $valor);
+        }
+
+        $caminhoArquivo = tempnam(sys_get_temp_dir(), 'xml');
+        $elementoXml->asXML($caminhoArquivo);
+
+        return $caminhoArquivo;
+    }
+}
+```
+
+Invocação dos diferentes tipos de conteúdo exportados por diferentes tipos de algoritmos de exportação:
+```php
+// relatorio.php
+<?php
+
+use Alura\DesignPattern\{Orcamento, Pedido};
+use Alura\DesignPattern\Relatorios\{OrcamentoExportado, PedidoExportado};
+use Alura\DesignPattern\Relatorios\{ArquivoXmlExportado, ArquivoZipExportado};
+
+require 'vendor/autoload.php';
+
+// Criação do orçamento
+$orcamento = new Orcamento();
+$orcamento->valor = 500;
+$orcamento->quantidadeItens = 7;
+$orcamentoExportado = new OrcamentoExportado($orcamento);
+
+// Criação e uso dos dois exportadores de orçamento.
+$orcamentoExportadoXml = new ArquivoXmlExportado("orcamento");
+echo $orcamentoExportadoXml->salvar($orcamentoExportado) . PHP_EOL;
+
+$orcamentoExportadoZip = new ArquivoZipExportado("orcamento.array");
+echo $orcamentoExportadoZip->salvar($orcamentoExportado) . PHP_EOL;
+
+// Criação de um pedido.
+$pedido = new Pedido();
+$pedido->nomeCliente = 'Teste';
+$pedido->dataFinalizacao = new \DateTimeImmutable();
+$pedidoExportado = new PedidoExportado($pedido);
+
+// Criação e uso dos dois exportadores de pedido.
+$pedidoExportadoXml = new ArquivoXmlExportado("pedido");
+echo $pedidoExportadoXml->salvar($pedidoExportado) . PHP_EOL;
+
+$pedidoExportadoZip = new ArquivoZipExportado("pedido.array");
+echo $pedidoExportadoZip->salvar($pedidoExportado) . PHP_EOL;
+
+```
