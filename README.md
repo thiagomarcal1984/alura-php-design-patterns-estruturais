@@ -382,5 +382,8 @@ echo $pedidoExportadoXml->salvar($pedidoExportado) . PHP_EOL;
 
 $pedidoExportadoZip = new ArquivoZipExportado("pedido.array");
 echo $pedidoExportadoZip->salvar($pedidoExportado) . PHP_EOL;
-
 ```
+## Explicando o padrão
+As interfaces `ConteudoExportado` e `ArquivoExportado` são dois lados de uma ponte entre os diversos tipos de conteúdo concretos (orçamentos, pedidos, notas fiscais etc.) e os diversos algoritmos de exportação concretos (XML, CSV, JSON, ZIP etc.).
+
+Leitura complementar sobre o padrão Bridge: https://refactoring.guru/design-patterns/bridge
