@@ -530,3 +530,85 @@ echo $calculadora->calcula($orcamento, new Icms()) . PHP_EOL; // Resultado: 10
 O padrão decorator é uma forma de **adicionar, em tempo de execução, funcionalidades a outra funcionalidade já existente**. No caso dos impostos, a funcionalidade é acumular impostos obtidos de diferentes classes.
 
 Leitura complementar sobre o padrão Decorator: https://refactoring.guru/design-patterns/decorator
+
+# Compondo orçamentos com Composite
+## Apresentando o problema
+A classe `Orcamento` vai ser modificada para uma estrutura master/detail: vamos acrescentar a classe `ItemOrcamento`.
+
+Classe `Orcamento`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+use Alura\DesignPattern\EstadosOrcamento\EmAprovacao;
+use Alura\DesignPattern\EstadosOrcamento\EstadoOrcamento;
+
+class Orcamento
+{
+    private array $itens;
+    public EstadoOrcamento $estadoAtual;
+
+    public function __construct()
+    {
+        $this->estadoAtual = new EmAprovacao();
+        $this->itens = [];
+    }
+    
+    // ... omissão do resto do código.
+    
+    public function addItem(ItemOrcamento $item)
+    {
+        $this->itens[] = $item;
+    }
+
+    public function valor() : float
+    {
+        return array_reduce(
+            $this->itens, 
+            fn ($valorAcumulado, $item) => $item->valor + $valorAcumulado, 0
+            /*
+            // A linha acima é igual a esta linha de baixo:
+            function(float $valorAcumulado, ItemOrcamento $item) {
+                return $item->valor + $valorAcumulado;
+            },
+            0 // Valor inicial da variável $valorAcumulado.
+            */
+        );
+    }
+}
+```
+
+Classe `ItemOrcamento`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class ItemOrcamento
+{
+    public float $valor;
+}
+```
+Teste da classe no arqiuvo `itens.php`:
+```php
+<?php
+
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\Orcamento;
+
+require 'vendor/autoload.php';
+
+$orcamento = new Orcamento();
+
+$item1 = new ItemOrcamento();
+$item1->valor = 300;
+$item2 = new ItemOrcamento();
+$item2->valor = 500;
+
+$orcamento->addItem($item1);
+$orcamento->addItem($item2);
+
+echo $orcamento->valor(); // Resultado: 800
+```
+> O problema em questão é: como fazer um orçamento composto por outros orçamentos?
