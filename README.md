@@ -733,3 +733,8 @@ $orcamento->addItem($orcamentoMaisAntigoAinda);
 
 echo $orcamento->valor(); // Exibe 1100.
 ```
+
+## Explicando o padrão
+O padrão Composite cria uma árvore em que cada nó contribui para uma ação conjunta maior. Pense na analogia de um exército, em que a hierarquia mais alta representa o nó do composite. No exemplo dos orçamentos, totalizar cada orçamento que compõe o orçamento geral.
+
+Leitura complementar sobre o padrão Composite: https://refactoring.guru/design-patterns/composite
