@@ -410,3 +410,118 @@ class IcmsComIss implements Imposto
     }
 }
 ```
+## Decorando impostos
+A solução é usar uma recursividade do cálculo de impostos: uma classe abstrata contém um método que chama recursivamente os impostos, que são encadeados nos construtores de cada classe de imposto.
+
+Mudança da interface `Imposto` para classe abstrata:
+```php
+<?php
+
+namespace Alura\DesignPattern\Impostos;
+
+use Alura\DesignPattern\Orcamento;
+
+abstract class Imposto
+{
+    private ?Imposto $outroImposto;
+
+    public function __construct(Imposto $outroImposto = null)
+    {
+        $this->outroImposto = $outroImposto;
+    }
+
+    abstract protected function realizaCalculoEspecifico(Orcamento $orcamento): float;
+
+    public function calculaImposto(Orcamento $orcamento): float
+    {
+        return
+            $this->realizaCalculoEspecifico($orcamento) +
+            $this->realizaCalculoDeOutroImposto($orcamento);
+    }
+
+    private function realizaCalculoDeOutroImposto(Orcamento $orcamento)
+    {
+        return $this->outroImposto === null ?
+            0 :
+            $this->outroImposto->calculaImposto($orcamento);
+    }
+}
+```
+> Perceba que o método `realizaCalculoEspecifico` obtém o valor da classe de imposto específica; o método `calculaImposto` é o metodo que calcula o valor do imposto atual e soma recursivamente com o valor do outro imposto, calculado pelo método `realizaCalculoDeOutroImposto`.
+
+Adaptação do imposto ICMS:
+```php
+<?php
+
+namespace Alura\DesignPattern\Impostos;
+
+use Alura\DesignPattern\Orcamento;
+
+class Icms extends Imposto
+{
+    public function realizaCalculoEspecifico(Orcamento $orcamento): float
+    {
+        return $orcamento->valor * 0.1;
+    }
+}
+```
+Adaptação da superclasse `ImpostoCom2Aliquotas` (base para as classes `Ikcv` e `Icpp`, as quais não precisaram de mudanças):
+```php
+<?php
+
+namespace Alura\DesignPattern\Impostos;
+
+use Alura\DesignPattern\Orcamento;
+
+abstract class ImpostoCom2Aliquotas extends Imposto
+{
+    public function realizaCalculoEspecifico(Orcamento $orcamento): float
+    {
+        if ($this->deveAplicarTaxaMaxima($orcamento)) {
+            return $this->calculaTaxaMaxima($orcamento);
+        }
+
+        return $this->calculaTaxaMinima($orcamento);
+    }
+
+    abstract protected function deveAplicarTaxaMaxima(Orcamento $orcamento): bool;
+    abstract protected function calculaTaxaMaxima(Orcamento $orcamento): float;
+    abstract protected function calculaTaxaMinima(Orcamento $orcamento): float;
+}
+```
+Adaptação do imposto ISS:
+```php
+<?php
+
+namespace Alura\DesignPattern\Impostos;
+
+use Alura\DesignPattern\Orcamento;
+
+class Iss extends Imposto
+{
+    public function realizaCalculoEspecifico(Orcamento $orcamento): float
+    {
+        return $orcamento->valor * 0.06;
+    }
+}
+```
+Execução combinada de diferentes impostos no arquivo `teste.php`:
+```php
+<?php
+
+use Alura\DesignPattern\CalculadoraDeDescontos;
+use Alura\DesignPattern\CalculadoraDeImpostos;
+use Alura\DesignPattern\Impostos\{Icms, Iss};
+use Alura\DesignPattern\Orcamento;
+
+require 'vendor/autoload.php';
+
+$calculadora = new CalculadoraDeImpostos();
+
+$orcamento = new Orcamento();
+$orcamento->valor = 100;
+
+echo $calculadora->calcula($orcamento, new Iss(new Icms())) . PHP_EOL; // Resultado: 16
+echo $calculadora->calcula($orcamento, new Iss()) . PHP_EOL; // Resultado: 6
+echo $calculadora->calcula($orcamento, new Icms()) . PHP_EOL; // Resultado: 10
+```
