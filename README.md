@@ -1,7 +1,7 @@
 # Padrões estruturais (Gang of Four)
 - [x] Adapter
 - [x] Bridge
-- [ ] Composite
+- [x] Composite
 - [x] Decorator
 - [ ] Façade (ou Facade)
 - [ ] Business Delegate (?)
@@ -738,3 +738,52 @@ echo $orcamento->valor(); // Exibe 1100.
 O padrão Composite cria uma árvore em que cada nó contribui para uma ação conjunta maior. Pense na analogia de um exército, em que a hierarquia mais alta representa o nó do composite. No exemplo dos orçamentos, totalizar cada orçamento que compõe o orçamento geral.
 
 Leitura complementar sobre o padrão Composite: https://refactoring.guru/design-patterns/composite
+
+# Facade para descontos
+## Logando um desconto
+Criação de uma classe fictícia para logar os descontos calculados:
+
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class LogDesconto
+{
+    public function informar(float $descontoCalculado): void
+    {
+        // biblioteca de log
+        echo "Salvando log de desconto: $descontoCalculado" . PHP_EOL;
+    }
+}
+```
+
+Uso da classe fictícia na classe `CalculadoraDeDescontos`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+use Alura\DesignPattern\Descontos\Desconto;
+use Alura\DesignPattern\Descontos\DescontoMaisDe500Reais;
+use Alura\DesignPattern\Descontos\DescontoMaisDe5Itens;
+use Alura\DesignPattern\Descontos\SemDesconto;
+
+class CalculadoraDeDescontos
+{
+    public function calculaDescontos(Orcamento $orcamento): float
+    {
+        $cadeiaDeDescontos = new DescontoMaisDe5Itens(
+            new DescontoMaisDe500Reais(
+                new SemDesconto()
+            )
+        );
+
+        $descontoCalculado = $cadeiaDeDescontos->calculaDesconto($orcamento);
+        $logDesconto = new LogDesconto();
+        $logDesconto->informar($descontoCalculado);
+        
+        return $descontoCalculado;
+    }
+}
+```
