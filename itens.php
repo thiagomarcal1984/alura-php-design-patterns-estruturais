@@ -1,5 +1,6 @@
 <?php
 
+use Alura\DesignPattern\CacheOrcamentoProxy;
 use Alura\DesignPattern\ItemOrcamento;
 use Alura\DesignPattern\Orcamento;
 
@@ -31,5 +32,11 @@ $orcamentoMaisAntigoAinda->addItem($item5);
 $orcamento->addItem($orcamentoAntigo);
 $orcamento->addItem($orcamentoMaisAntigoAinda);
 
-echo $orcamento->valor(); // Demora de 5 segundos.
-echo $orcamento->valor(); // Demora de mais 5 segundos.
+$proxyCache = new CacheOrcamentoProxy($orcamento);
+
+echo $proxyCache->valor(); // Demora de 5 segundos para atribuir valor ao cache.
+echo $proxyCache->valor(); // Agora o resultado é imediato, porque busca do cache...
+echo $proxyCache->valor(); // ... do cache...
+echo $proxyCache->valor(); // ... do cache...
+echo $proxyCache->valor(); // ... do cache...
+echo $proxyCache->valor(); // ... do cache.

@@ -3,7 +3,7 @@
 - [x] Bridge
 - [x] Composite
 - [x] Decorator
-- [ ] Façade (ou Facade)
+- [x] Façade (ou Facade)
 - [ ] Business Delegate (?)
 - [ ] Flyweight
 - [ ] Proxy
@@ -831,3 +831,58 @@ echo $orcamento->valor(); // Demora de 5 segundos.
 echo $orcamento->valor(); // Demora de mais 5 segundos.
 ```
 > Como evitar a repetição da consulta no mesmo orçamento?
+
+## Implementando um Proxy
+A classe `CacheOrcamentoProxy` a seguir extende da classe concreta `Orcamento` (e não da interface `Orcavel`):
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class CacheOrcamentoProxy extends Orcamento
+{
+    private float $valorCache = 0;
+    private Orcamento $orcamento;
+
+    public function __construct(Orcamento $orcamento)
+    {
+        $this->orcamento = $orcamento;
+    }
+
+    public function addItem(Orcavel $item)
+    {
+        throw new \DomainException('Não é possível adicionar item a um orçamento cacheado.');
+    }
+
+    public function valor(): float
+    {
+        if ($this->valorCache  == 0)
+            $this->valorCache = $this->orcamento->valor();
+        return $this->valorCache;
+    }
+}
+```
+
+Agora, para impedir a latência, instanciamos um proxy do orçamento cujo valor queremos buscar (arquivo `itens.php`):
+```php
+<?php
+
+use Alura\DesignPattern\CacheOrcamentoProxy;
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\Orcamento;
+
+require 'vendor/autoload.php';
+
+$orcamento = new Orcamento();
+
+// Operações sobre o orçamento.
+
+$proxyCache = new CacheOrcamentoProxy($orcamento);
+
+echo $proxyCache->valor(); // Demora de 5 segundos para atribuir valor ao cache.
+echo $proxyCache->valor(); // Agora o resultado é imediato, porque busca do cache...
+echo $proxyCache->valor(); // ... do cache...
+echo $proxyCache->valor(); // ... do cache...
+echo $proxyCache->valor(); // ... do cache...
+echo $proxyCache->valor(); // ... do cache.
+```
