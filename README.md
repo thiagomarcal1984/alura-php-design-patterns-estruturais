@@ -387,3 +387,26 @@ echo $pedidoExportadoZip->salvar($pedidoExportado) . PHP_EOL;
 As interfaces `ConteudoExportado` e `ArquivoExportado` são dois lados de uma ponte entre os diversos tipos de conteúdo concretos (orçamentos, pedidos, notas fiscais etc.) e os diversos algoritmos de exportação concretos (XML, CSV, JSON, ZIP etc.).
 
 Leitura complementar sobre o padrão Bridge: https://refactoring.guru/design-patterns/bridge
+
+# Mais de um imposto com Decorators
+## Implementando impostos compostos
+Suponhamos que seja necessário combinar impostos de classes diferentes. Implementar essa combinação em uma classe deixa tudo mais complexo e o número de classes resultantes dessa combinação pode crescer ao infinito.
+
+Código de exemplo da combinação do ICMS com ISS: 
+```php
+<?php
+
+namespace Alura\DesignPattern\Impostos;
+
+use Alura\DesignPattern\Orcamento;
+
+class IcmsComIss implements Imposto
+{
+    public function calculaImposto(Orcamento $orcamento): float
+    {
+        return 
+            (new Icms())->calculaImposto($orcamento) + 
+            (new Iss())->calculaImposto($orcamento);
+    }
+}
+```
