@@ -612,3 +612,8 @@ $orcamento->addItem($item2);
 echo $orcamento->valor(); // Resultado: 800
 ```
 > O problema em questão é: como fazer um orçamento composto por outros orçamentos?
+
+## Para saber mais: Arrays
+Os arrays no PHP são muito poderosos e há inúmeras funções para tratá-los e manipulá-los. No último vídeo, nós utilizamos a função array_reduce, que reduz um array a um único valor. No nosso caso, reduzimos um array de itens à soma de seus valores.
+
+Para entender melhor o funcionamento desta e algumas outras funções, aqui está uma publicação no blog da Alura sobre arrays: Trabalhando com arrays em PHP (https://www.alura.com.br/artigos/trabalhando-com-arrays-em-php?_gl=1*zuszoz*_ga*MTYzNjkzMDE3Ny4xNjM1MzYwNzUx*_ga_59FP0KYKSM*MTY5MjUzODEyOC4yMTYuMS4xNjkyNTQyOTQ4LjAuMC4w*_fplc*S05WZ2kxSWFQYyUyRlhpWlolMkZpZ3V3U0dtV2l1MVVhM2R3UVZNTFFTbzU3OXNVRGpGcDNJZlg2b3lnWTczN084RVJEWm44Mjhob1dHa3VBaVJZN1dCekZRUWs0ckU5UVI3emgyZFR0RVp2Rm13dmg4OVFzakg5TngwN0MlMkIyelhRJTNEJTNE*_ga_1EPWSW3PCS*MTY5MjU0MDUzNS45LjEuMTY5MjU0Mjk0OC4wLjAuMA..).
