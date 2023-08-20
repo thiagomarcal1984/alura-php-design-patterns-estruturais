@@ -1,8 +1,8 @@
 # Padrões estruturais (Gang of Four)
 - [x] Adapter
-- [ ] Bridge
+- [x] Bridge
 - [ ] Composite
-- [ ] Decorator
+- [x] Decorator
 - [ ] Façade (ou Facade)
 - [ ] Business Delegate (?)
 - [ ] Flyweight
@@ -525,3 +525,8 @@ echo $calculadora->calcula($orcamento, new Iss(new Icms())) . PHP_EOL; // Result
 echo $calculadora->calcula($orcamento, new Iss()) . PHP_EOL; // Resultado: 6
 echo $calculadora->calcula($orcamento, new Icms()) . PHP_EOL; // Resultado: 10
 ```
+
+## Explicando o padrão
+O padrão decorator é uma forma de **adicionar, em tempo de execução, funcionalidades a outra funcionalidade já existente**. No caso dos impostos, a funcionalidade é acumular impostos obtidos de diferentes classes.
+
+Leitura complementar sobre o padrão Decorator: https://refactoring.guru/design-patterns/decorator
