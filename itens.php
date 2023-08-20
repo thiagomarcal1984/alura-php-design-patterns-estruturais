@@ -31,4 +31,5 @@ $orcamentoMaisAntigoAinda->addItem($item5);
 $orcamento->addItem($orcamentoAntigo);
 $orcamento->addItem($orcamentoMaisAntigoAinda);
 
-echo $orcamento->valor();
+echo $orcamento->valor(); // Demora de 5 segundos.
+echo $orcamento->valor(); // Demora de mais 5 segundos.

@@ -795,3 +795,39 @@ No exemplo da classe `CalculadoraDeDescontos`, a fachada calcula o desconto em c
 O framework PHP Laravel usa muitas fachadas.
 
 Leitura complementar sobre o padrão Facade: https://refactoring.guru/design-patterns/facade
+
+# Proxy de cache
+## Demora no cálculo do valor
+Suponhamos que a classe `ItemOrcamento` busque dados de uma API e que a busca desses dados demore 1 segundo:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class ItemOrcamento implements Orcavel
+{
+    public float $valor;
+
+    public function valor() : float{
+        sleep(1); // Simulando a latência da API.
+        return $this->valor;
+    }
+}
+```
+O código a seguir demoraria 10 segundos para terminar sua execução (`itens.php`):
+```php
+<?php
+
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\Orcamento;
+
+require 'vendor/autoload.php';
+
+$orcamento = new Orcamento();
+
+// Operações sobre o orçamento.
+
+echo $orcamento->valor(); // Demora de 5 segundos.
+echo $orcamento->valor(); // Demora de mais 5 segundos.
+```
+> Como evitar a repetição da consulta no mesmo orçamento?
