@@ -6,7 +6,7 @@
 - [x] Façade (ou Facade)
 - [ ] Business Delegate (?)
 - [ ] Flyweight
-- [ ] Proxy
+- [x] Proxy
 
 Fonte: https://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software
 
@@ -886,3 +886,11 @@ echo $proxyCache->valor(); // ... do cache...
 echo $proxyCache->valor(); // ... do cache...
 echo $proxyCache->valor(); // ... do cache.
 ```
+## Explicando o padrão
+Note que o uso do método `valor()` no orçamento original é limitado pelo objeto proxy.
+
+Um cartão de crédito é um proxy para a nossa conta bancária.
+
+Os padrões Proxy e Decorator são semelhantes, mas a diferença é que o Decorator `acrescenta` funcionalidades, enquanto o proxy `limita/intercepta` funcionalidades sob certas condições.
+
+Leitura complementar sobre o padrão Proxy: https://refactoring.guru/design-patterns/proxy
