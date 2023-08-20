@@ -787,3 +787,11 @@ class CalculadoraDeDescontos
     }
 }
 ```
+## Falando sobre Facades
+O padrão Facade visa disponibilizar uma interface simplificada para usar várias outras classes. Você não precisa conhecer todos os subsistemas para usar seus recursos: basta usar uma facade/fachada.
+
+No exemplo da classe `CalculadoraDeDescontos`, a fachada calcula o desconto em cadeia e faz o log dele.
+
+O framework PHP Laravel usa muitas fachadas.
+
+Leitura complementar sobre o padrão Facade: https://refactoring.guru/design-patterns/facade
