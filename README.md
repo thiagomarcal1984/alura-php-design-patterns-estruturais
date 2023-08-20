@@ -617,3 +617,119 @@ echo $orcamento->valor(); // Resultado: 800
 Os arrays no PHP são muito poderosos e há inúmeras funções para tratá-los e manipulá-los. No último vídeo, nós utilizamos a função array_reduce, que reduz um array a um único valor. No nosso caso, reduzimos um array de itens à soma de seus valores.
 
 Para entender melhor o funcionamento desta e algumas outras funções, aqui está uma publicação no blog da Alura sobre arrays: Trabalhando com arrays em PHP (https://www.alura.com.br/artigos/trabalhando-com-arrays-em-php?_gl=1*zuszoz*_ga*MTYzNjkzMDE3Ny4xNjM1MzYwNzUx*_ga_59FP0KYKSM*MTY5MjUzODEyOC4yMTYuMS4xNjkyNTQyOTQ4LjAuMC4w*_fplc*S05WZ2kxSWFQYyUyRlhpWlolMkZpZ3V3U0dtV2l1MVVhM2R3UVZNTFFTbzU3OXNVRGpGcDNJZlg2b3lnWTczN084RVJEWm44Mjhob1dHa3VBaVJZN1dCekZRUWs0ckU5UVI3emgyZFR0RVp2Rm13dmg4OVFzakg5TngwN0MlMkIyelhRJTNEJTNE*_ga_1EPWSW3PCS*MTY5MjU0MDUzNS45LjEuMTY5MjU0Mjk0OC4wLjAuMA..).
+
+## Compondo orçamentos
+Os orçamentos funcionarão como uma árvore: um orçamento pode conter outros orçamentos.
+
+Para isso, o elemento raiz e as "folhas" dessa raiz devem implementar uma mesma interface. Neste caso, usaremos uma nova interface chamada `Orcavel`:
+
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+interface Orcavel
+{
+    public function valor() : float;
+}
+```
+
+Mudanças na classe `ItemOrcamento`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class ItemOrcamento implements Orcavel
+{
+    public float $valor;
+
+    public function valor() : float{
+        // Cuidado pra não chamar recursivamente o método valor(),
+        // senão estoura a pilha da memória.
+        return $this->valor; 
+    }
+}
+```
+
+Mudanças na classe `Orcamento`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+use Alura\DesignPattern\EstadosOrcamento\EmAprovacao;
+use Alura\DesignPattern\EstadosOrcamento\EstadoOrcamento;
+
+class Orcamento implements Orcavel // Implementação da interface.
+{
+    private array $itens;
+    public EstadoOrcamento $estadoAtual;
+
+    public function __construct()
+    {
+        $this->estadoAtual = new EmAprovacao();
+        $this->itens = [];
+    }
+
+    // ... omissão do resto do código.
+
+    // A função generalizou: antes era o parâmetro era concreto: ItemOrcamento.
+    public function addItem(Orcavel $item) 
+    {
+        $this->itens[] = $item;
+    }
+
+    public function valor() : float
+    {
+        return array_reduce(
+            $this->itens, 
+            fn (float $valorAcumulado, Orcavel $item) => $item->valor() + $valorAcumulado, 0
+            /*
+            // A linha acima é igual a esta linha de baixo:
+            function(float $valorAcumulado, Orcavel $item) {
+                return $item->valor() + $valorAcumulado;
+            },
+            0 // Valor inicial da variável $valorAcumulado.
+            */
+        );
+    }
+}
+```
+Execução do padrão Composite no arquivo `itens.php`:
+```php
+<?php
+
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\Orcamento;
+
+require 'vendor/autoload.php';
+
+$orcamento = new Orcamento();
+
+$item1 = new ItemOrcamento();
+$item1->valor = 300;
+$item2 = new ItemOrcamento();
+$item2->valor = 500;
+
+$orcamento->addItem($item1);
+$orcamento->addItem($item2);
+
+$orcamentoAntigo = new Orcamento();
+$item3 = new ItemOrcamento();
+$item3->valor = 150;
+$orcamentoAntigo->addItem($item3);
+
+$orcamentoMaisAntigoAinda = new Orcamento();
+$item4 = new ItemOrcamento();
+$item4->valor = 50;
+$item5 = new ItemOrcamento();
+$item5->valor = 100;
+$orcamentoMaisAntigoAinda->addItem($item4);
+$orcamentoMaisAntigoAinda->addItem($item5);
+
+$orcamento->addItem($orcamentoAntigo);
+$orcamento->addItem($orcamentoMaisAntigoAinda);
+
+echo $orcamento->valor(); // Exibe 1100.
+```
