@@ -894,3 +894,32 @@ Um cartão de crédito é um proxy para a nossa conta bancária.
 Os padrões Proxy e Decorator são semelhantes, mas a diferença é que o Decorator `acrescenta` funcionalidades, enquanto o proxy `limita/intercepta` funcionalidades sob certas condições.
 
 Leitura complementar sobre o padrão Proxy: https://refactoring.guru/design-patterns/proxy
+
+# Flyweight: Pedidos mais leves
+## Milhares de pedidos
+Arquivo `pedidos.php` para criação de milhares de pedidos:
+
+```php
+<?php
+
+use Alura\DesignPattern\Orcamento;
+use Alura\DesignPattern\Pedido;
+
+require 'vendor/autoload.php';
+
+$pedidos = [];
+$hoje = new DateTimeImmutable();
+
+for ($i = 0; $i < 10000; $i++) {
+    $pedido = new Pedido();
+    $pedido->nomeCliente = md5((string) rand(1, 10000));
+    $pedido->orcamento = new Orcamento();
+    $pedido->dataFinalizacao = $hoje;
+
+    $pedidos[] = $pedido;
+}
+
+// Exibir o uso de memória no arquivo.
+echo memory_get_peak_usage(); // 4053640 bytes.
+```
+> Como reusar algum objeto (por exemplo, um cliente) em várias instâncias de outros objetos?
