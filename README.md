@@ -5,7 +5,7 @@
 - [x] Decorator
 - [x] Façade (ou Facade)
 - [ ] Business Delegate (?)
-- [ ] Flyweight
+- [x] Flyweight
 - [x] Proxy
 
 Fonte: https://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software
@@ -982,3 +982,66 @@ echo memory_get_peak_usage();
 // Antes usávamos 4053640 bytes.
 // Agora usamos 3254928 bytes.
 ```
+## Explicando o padrão
+O padrão Flyweight tem a desvantagem de tornar a semântica complexa (diferenciar o que intrínseco do que é extrínseco aos objetos obscurece o código, mas com isso há economia de memória).
+
+É importante encapsular o estado dos objetos extrínsecos. Por isso, remova os setters desses objetos.
+
+Adaptação do código dos dados extrínsecos:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class DadosExtrinsecosPedido
+{
+    private string $nomeCliente;
+    private \DateTimeInterface $dataFinalizacao;
+
+    public function __construct(string $nomeCliente, \DateTimeInterface $dataFinalizacao)
+    {
+        $this->nomeCliente = $nomeCliente;
+        $this->dataFinalizacao = $dataFinalizacao;
+    }
+
+    public function nomeCliente(): string 
+    {
+        return $this->nomeCliente;
+    }
+    public function dataFinalizacao(): \DateTimeInterface 
+    {
+        return $this->dataFinalizacao;
+    }
+}
+```
+Adaptação do código de invocação do Flyweight (mudanças no construtor dos dados extrínsecos ao pedido):
+```php
+<?php
+
+use Alura\DesignPattern\DadosExtrinsecosPedido;
+use Alura\DesignPattern\Orcamento;
+use Alura\DesignPattern\Pedido;
+
+require 'vendor/autoload.php';
+
+$pedidos = [];
+$dados = new DadosExtrinsecosPedido(
+    md5((string) rand(1, 10000)),
+    new DateTimeImmutable()
+);
+
+for ($i = 0; $i < 10000; $i++) {
+    $pedido = new Pedido();
+    $pedido->dados = $dados;
+    $pedido->orcamento = new Orcamento();
+
+    $pedidos[] = $pedido;
+}
+
+// Exibir o uso de memória no arquivo.
+echo memory_get_peak_usage(); 
+// Antes usávamos 4053640 bytes.
+// Agora usamos 3254928 bytes.
+```
+
+Leitura complementar sobre o padrão Flyweight: https://refactoring.guru/design-patterns/flyweight

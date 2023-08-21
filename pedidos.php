@@ -7,9 +7,10 @@ use Alura\DesignPattern\Pedido;
 require 'vendor/autoload.php';
 
 $pedidos = [];
-$dados = new DadosExtrinsecosPedido();
-$dados->dataFinalizacao = new DateTimeImmutable();
-$dados->nomeCliente = md5((string) rand(1, 10000));
+$dados = new DadosExtrinsecosPedido(
+    md5((string) rand(1, 10000)),
+    new DateTimeImmutable()
+);
 
 for ($i = 0; $i < 10000; $i++) {
     $pedido = new Pedido();
