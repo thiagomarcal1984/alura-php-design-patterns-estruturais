@@ -923,3 +923,62 @@ for ($i = 0; $i < 10000; $i++) {
 echo memory_get_peak_usage(); // 4053640 bytes.
 ```
 > Como reusar algum objeto (por exemplo, um cliente) em várias instâncias de outros objetos?
+
+## Aplicando Flyweight
+Há dados que são intrínsecos de um objeto (ou seja, variam de objeto para objeto) e dados extrínsecos (que podem ser reusados).
+
+A data e o nome do cliente, por exemplo, são extrínsecos do pedido. Já o orçamento é intrínseco.
+
+Implementação da classe de dados extrínsecos do pedido:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class DadosExtrinsecosPedido
+{
+    public string $nomeCliente;
+    public \DateTimeInterface $dataFinalizacao;
+}
+```
+Adaptação da classe `Pedido`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class Pedido
+{
+    public DadosExtrinsecosPedido $dados;
+    public Orcamento $orcamento;
+}
+```
+
+Invocação dos pedidos e de seus dados extrínsecos no script `pedidos.php`:
+```php
+<?php
+
+use Alura\DesignPattern\DadosExtrinsecosPedido;
+use Alura\DesignPattern\Orcamento;
+use Alura\DesignPattern\Pedido;
+
+require 'vendor/autoload.php';
+
+$pedidos = [];
+$dados = new DadosExtrinsecosPedido();
+$dados->dataFinalizacao = new DateTimeImmutable();
+$dados->nomeCliente = md5((string) rand(1, 10000));
+
+for ($i = 0; $i < 10000; $i++) {
+    $pedido = new Pedido();
+    $pedido->dados = $dados;
+    $pedido->orcamento = new Orcamento();
+
+    $pedidos[] = $pedido;
+}
+
+// Exibir o uso de memória no arquivo.
+echo memory_get_peak_usage(); 
+// Antes usávamos 4053640 bytes.
+// Agora usamos 3254928 bytes.
+```
